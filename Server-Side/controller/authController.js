@@ -4,7 +4,6 @@ import User from "../model/User.js";
 import crypto from "crypto";
 import RefreshToken from "../model/RefreshToken.js";
 import jwt from "jsonwebtoken";
-import rateLimit from "express-rate-limit";
 import sendEmail from "../utils/sendEmail.js";
 
 export const signup = async (req, res, next) => {
