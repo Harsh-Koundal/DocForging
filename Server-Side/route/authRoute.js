@@ -1,8 +1,11 @@
 import express from "express";
-import { signup } from "../controller/authController.js";
+import { login, signup, verfiyEmail } from "../controller/authController.js";
+import { authLimiter, loginLimiter, signupLimiter } from "../middleware/ratelimitMiddleware.js";
 
 const router = express.Router();
 
-router.post("/signup",signup);
+router.post("/signup",signupLimiter,signup);
+router.post("/verify",authLimiter,verfiyEmail);
+router.post("/login",loginLimiter,login);
 
 export default router;

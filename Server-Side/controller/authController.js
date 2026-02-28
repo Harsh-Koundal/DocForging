@@ -50,7 +50,7 @@ export const signup = async (req, res, next) => {
         const verificationTokenExpires = Date.now() + 15 * 60 * 1000;
 
         const newUser = await User.create({
-            name:name,
+            name: name,
             email: email.toLowerCase().trim(),
             passwordHash,
             verificationTokenHash,
@@ -83,37 +83,115 @@ export const signup = async (req, res, next) => {
     }
 };
 
-export const verfiyEmail = async(req,res,next)=>{
-    try{
-        const {token} = req.query;
+export const verfiyEmail = async (req, res, next) => {
+    try {
+        const { token } = req.query;
 
-        if(!token){
-            return res.status(400).json({message:"Invalid token"});
+        if (!token) {
+            return res.status(400).json({ message: "Invalid token" });
         }
 
         const tokenHash = crypto
-         .createHash("sha256")
-         .update(token)
-         .digest("hex");
+            .createHash("sha256")
+            .update(token)
+            .digest("hex");
 
-         const user = await User.findOne({
-            verificationTokenHash:tokenHash,
-            verificationTokenExpires:{$gt:Date.now()},
-         });
+        const user = await User.findOne({
+            verificationTokenHash: tokenHash,
+            verificationTokenExpires: { $gt: Date.now() },
+        });
 
-         if(!user)
-            return res.status(400).json({message:"Token expired or invalid"});
+        if (!user)
+            return res.status(400).json({ message: "Token expired or invalid" });
 
-         user.isVerified = true,
-         user.verificationTokenHash = undefined;
-         user.verificationTokenExpires = undefined;
+        user.isVerified = true,
+            user.verificationTokenHash = undefined;
+        user.verificationTokenExpires = undefined;
 
         await user.save();
 
-        return res.status(200).json({message:"Email verified successfully"});
+        return res.status(200).json({ message: "Email verified successfully" });
 
-    }catch(err){
-        console.error("Failed to verify email",err);
+    } catch (err) {
+        console.error("Failed to verify email", err);
         return next(err);
     }
-}
+};
+
+export const login = async (req, res, next) => {
+    try {
+        const { email, password } = req.body;
+
+        if (!email || !password)
+            return res.status(400).json({ message: "email  & password required" });
+
+        if (!validator.isEmail(email))
+            return res.status(400).json({ message: "Invalid Format" });
+
+        const user = await User.findOne({
+            email: email.toLowerCase().trim()
+        }).select("+passwordHash");
+
+        if (!user)
+            return res.status(401).json({ message: "Invalid Creditionals" });
+
+        if (user.isBlocked)
+            return res.status(403).json({ message: "Account Blocked" });
+
+        if (!user.isVerified) {
+            return res.status(403).json({ message: "Please verify email first" });
+        }
+
+        const isMatch = await bcrypt.compare(password, user.passwordHash);
+
+        if (!isMatch) {
+            user.loginAttempts += 1;
+            await user.save();
+            return res.status(401).json({ message: "Invalid Credentials" });
+        }
+
+        user.loginAttempts = 0;
+        await user.save();
+
+        const accessToken = jwt.sign(
+            { id: user._id, role: user.role },
+            process.env.ACCESS_TOKEN_SECRET,
+            { expiresIn: "15m" }
+        );
+
+        const refreshToken = crypto.randomBytes(64).toString("hex");
+
+        const tokenHash = crypto
+        .createHash("sha256")
+        .update(refreshToken)
+        .digest("hex");
+
+        await RefreshToken.create({
+            userId:user._id,
+            tokenHash,
+            ipAddress:req.ip,
+            deviceInfo:req.headers["user-agent"],
+            expiresAt:new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+        });
+
+        res.cookie("accessToken",accessToken,{
+            httpOnly:true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite:"Strict",
+            maxAge:15*60*1000,
+        })
+
+        res.cookie("refreshToken",refreshToken,{
+            httpOnly:true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite:"Strict",
+            maxAge:7*24*60*60*1000,
+        })
+
+        return res.status(200).json({message:"Login Successful"});
+
+    } catch (err) {
+        console.error("Failed to login", err);
+        next(err);
+    }
+};
