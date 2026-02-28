@@ -6,6 +6,8 @@ import helmet from "helmet";
 import morgan from "morgan";
 import connectDB from "./config/connectDB.js";
 
+import authRoute from "./route/authRoute.js"
+
 dotenv.config();
 
 
@@ -39,9 +41,11 @@ if(process.env.NODE_ENV === "development"){
 app.use(cors(corsOptions));
 app.use(helmet());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 // Routes
+app.use("/api/auth",authRoute);
 
 
 // Health Route
