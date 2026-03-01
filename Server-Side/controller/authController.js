@@ -5,6 +5,8 @@ import crypto from "crypto";
 import RefreshToken from "../model/RefreshToken.js";
 import jwt from "jsonwebtoken";
 import sendEmail from "../utils/sendEmail.js";
+import { sendEmailEvent } from "../utils/kafkaProducer.js";
+import { type } from "os";
 
 export const signup = async (req, res, next) => {
     try {
@@ -56,17 +58,11 @@ export const signup = async (req, res, next) => {
             verificationTokenExpires,
         });
 
-        const verifyUrl = `${process.env.CLIENT_URL}/verify-email?token=${verificationToken}`;
-
-        await sendEmail({
-            to: newUser.email,
-            subject: "Verify Your Email",
-            html: `
-            <h2>Email Verification</h2>
-            <p>Click the link below to verify your account:</p>
-            <a href="${verifyUrl}"><b>Click Here</b></a>
-            `
-        })
+        await sendEmailEvent({
+            type:"EMAIL_VERIFICATION",
+            email: newUser.email,
+            verificationToken,
+        });
 
         return res.status(201).json({
             message: "User Created Successfully",
