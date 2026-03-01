@@ -5,7 +5,7 @@ import { authLimiter, loginLimiter, signupLimiter } from "../middleware/ratelimi
 const router = express.Router();
 
 router.post("/signup",signupLimiter,signup);
-router.post("/verify",authLimiter,verfiyEmail);
+router.get("/verify",authLimiter,verfiyEmail);
 router.post("/login",loginLimiter,login);
 
 export default router;
