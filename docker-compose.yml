@@ -1,0 +1,90 @@
+services:
+  mongodb:
+    image: mongo:7
+    container_name: docforging-mongodb
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.6.1
+    container_name: docforging-zookeeper
+    restart: unless-stopped
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+
+  kafka:
+    image: confluentinc/cp-kafka:7.6.1
+    container_name: docforging-kafka
+    restart: unless-stopped
+    depends_on:
+      - zookeeper
+    ports:
+      - "29092:29092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
+      KAFKA_LISTENERS: INTERNAL://0.0.0.0:9092,EXTERNAL://0.0.0.0:29092
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka:9092,EXTERNAL://localhost:29092
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+
+  server:
+    build:
+      context: ./Server-Side
+      dockerfile: Dockerfile
+    container_name: docforging-server
+    restart: unless-stopped
+    depends_on:
+      - mongodb
+      - kafka
+    ports:
+      - "5020:5020"
+    env_file:
+      - ./Server-Side/.env
+    environment:
+      NODE_ENV: production
+      PORT: 5020
+      DB_URI: mongodb://mongodb:27017/docforging
+      KAFKA_BROKER: kafka:9092
+      CLIENT_URL: http://localhost:5173
+      JWT_SECRET: Money
+      ACCESS_TOKEN_SECRET: Money
+      JWT_EXPIRES_IN: 7d
+      SMTP_HOST: smtp.gmail.com
+      SMTP_PORT: 587
+      MAIL_USER: aharsh3039@gmail.com
+      MAIL_PASS: qvgs lmwx fmzc gqut
+      ADMIN_MAIL: aharsh3039@gmail.com
+
+  consumer:
+    build:
+      context: ./Server-Side
+      dockerfile: Dockerfile
+    container_name: docforging-consumer
+    restart: unless-stopped
+    depends_on:
+      - kafka
+    env_file:
+      - ./Server-Side/.env
+    environment:
+      KAFKA_BROKER: kafka:9092
+    command: ["node", "./utils/kafkaConsumer.js"]
+
+  client:
+    build:
+      context: ./Client-Side
+      dockerfile: Dockerfile
+    container_name: docforging-client
+    restart: unless-stopped
+    depends_on:
+      - server
+    ports:
+      - "5173:80"
+
+volumes:
+  mongo_data:
