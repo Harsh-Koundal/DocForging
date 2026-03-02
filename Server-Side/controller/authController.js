@@ -80,7 +80,7 @@ export const signup = async (req, res, next) => {
 
 export const verfiyEmail = async (req, res, next) => {
     try {
-        const { token } = req.query;
+        const { token } = req.params;
 
         if (!token) {
             return res.status(400).json({ message: "Invalid token" });
@@ -105,7 +105,7 @@ export const verfiyEmail = async (req, res, next) => {
 
         await user.save();
 
-        return res.status(200).json({ message: "Email verified successfully" });
+        return res.redirect(`${process.env.CLIENT_URL}/email-verify-success/${token}`);
 
     } catch (err) {
         console.error("Failed to verify email", err);

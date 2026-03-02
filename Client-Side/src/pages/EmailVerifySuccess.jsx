@@ -26,7 +26,7 @@ const EmailVerifySuccess = () => {
         </h1>
         <p className="text-gray-600 mb-6">
           Your email has been verified successfully. You can now log in to your
-          account and start using StudyVault.
+          account and start using DocForging.
         </p>
 
         <Link

@@ -31,7 +31,7 @@ await consumer.run({
       if (data.type === "EMAIL_VERIFICATION") {
         console.log("Processing email verification...");
 
-        const verifyUrl = `${process.env.CLIENT_URL}/verify-email?token=${data.verificationToken}`;
+        const verifyUrl = `${process.env.SERVER_URL}/api/auth/verify/${data.verificationToken}`;
 
         await sendEmail({
           to: data.email,
