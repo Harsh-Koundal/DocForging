@@ -5,6 +5,7 @@ import { ScrollTop } from './components/Scroll'
 import EmailVerifySuccess from './pages/EmailVerifySuccess'
 import Home from './pages/Home'
 import EmailVerifyFailed from './pages/EmailVerifyFailed'
+import Signup from './pages/Signup'
 
 
 function App() {
@@ -15,6 +16,7 @@ function App() {
       <Routes>
         <Route path='/' element={<Home />} />
         <Route path='/login' element={<Login />} />
+        <Route path='/signup' element={<Signup />} />
         <Route path='/email-verify-success/:token' element={<EmailVerifySuccess />} />
         <Route path='/email-verify-failed/:token' element={<EmailVerifyFailed />} />
       </Routes>
