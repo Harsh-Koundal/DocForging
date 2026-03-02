@@ -12,26 +12,38 @@ const kafka = new Kafka({
 
 const consumer = kafka.consumer({ groupId: "email-group" });
 
+console.log("Connecting consumer...");
+
 await consumer.connect();
-await consumer.subscribe({ topic: "email-topic", fromBeginning: false });
+console.log("Consumer connected");
+
+await consumer.subscribe({ topic: "email-topic", fromBeginning: true });
+console.log("Subscribed to topic");
 
 await consumer.run({
-    eachMessage: async ({ message }) => {
-        const data = JSON.parse(message.value.toString());
+  eachMessage: async ({ topic, partition, message }) => {
+    console.log("Message received:");
+    console.log(message.value.toString());
 
-        if (data.type === "EMAIL_VERIFICATION") {
-            const verifyUrl = `${process.env.CLIENT_URL}/verify-email?token=${data.verificationToken}`;
+    try {
+      const data = JSON.parse(message.value.toString());
 
-            await sendEmail({
-            to: data.email,
-            subject: "Verify Your Email",
-            html: `
-            <h2>Email Verification</h2>
-            <p>Click the link below to verify your account:</p>
-            <a href="${verifyUrl}"><b>Click Here</b></a>
-            `,
-            });
-            console.log("message sent");
-        }
-    },
+      if (data.type === "EMAIL_VERIFICATION") {
+        console.log("Processing email verification...");
+
+        const verifyUrl = `${process.env.CLIENT_URL}/verify-email?token=${data.verificationToken}`;
+
+        await sendEmail({
+          to: data.email,
+          subject: "Verify Your Email",
+          html: `<h2>Email Verification</h2>
+                 <a href="${verifyUrl}">Click Here</a>`,
+        });
+
+        console.log("Email sent successfully");
+      }
+    } catch (err) {
+      console.error("Email processing error:", err);
+    }
+  },
 });
