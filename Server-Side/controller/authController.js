@@ -83,7 +83,7 @@ export const verfiyEmail = async (req, res, next) => {
         const { token } = req.params;
 
         if (!token) {
-            return res.status(400).json({ message: "Invalid token" });
+            return res.redirect(`${process.env.CLIENT_URL}/email-verify-failed/${token}`);
         }
 
         const tokenHash = crypto
@@ -97,7 +97,7 @@ export const verfiyEmail = async (req, res, next) => {
         });
 
         if (!user)
-            return res.status(400).json({ message: "Token expired or invalid" });
+            return res.redirect(`${process.env.CLIENT_URL}/email-verify-failed/${token}`);
 
         user.isVerified = true,
             user.verificationTokenHash = undefined;
