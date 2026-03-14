@@ -51,6 +51,16 @@ const userSchema = new mongoose.Schema(
             type: Number,
             default: 0,
         },
+
+        storageUsed:{
+            type:Number,
+            default:0,
+        },
+
+        storageLimit:{
+            type:Number,
+            default:10*1024*1024,
+        },
     },
     { timestamps: true },
 );
