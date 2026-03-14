@@ -188,3 +188,37 @@ export const login = async (req, res, next) => {
         next(err);
     }
 };
+
+export const logout = async ( req, res, next)=>{
+    try{
+        const refreshToken = req.cookies?.refreshToken;
+
+        if(refreshToken){
+            const tokenHash = crypto
+            .createHash("sha256")
+            .update(refreshToken)
+            .digest("hex");
+
+            await RefreshToken.deleteOne({tokenHash});
+        }
+
+        res.clearCookie("accessToken",{
+            httpOnly:true,
+            secure:process.env.NODE_ENV === "production",
+            sameSite: "Strict",
+        });
+
+        res.clearCookie("refreshToken",{
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "Strict",
+        });
+
+        return res.status(200).json({
+            message:"Logout Successfull"
+        });
+    }catch(err){
+        console.error("Logout failed",err);
+        next(err);
+    }
+};
