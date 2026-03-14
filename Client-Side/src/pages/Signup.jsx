@@ -127,7 +127,7 @@ const Signup = () => {
       );
       setFormData({ name: '', email: '', password: '' });
       toast.success('Welcome back!');
-      navigate('/');
+      navigate('/login');
     } catch (err) {
       toast.error(err?.response?.data?.message || 'Invalid email or password.');
     } finally {
