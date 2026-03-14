@@ -1,3 +1,65 @@
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+
+.nav-font {
+    font-family: 'DM Sans', sans-serif;
+}
+
+.logo-font {
+    font-family: 'Syne', sans-serif;
+}
+
+.search-glow:focus-within {
+    box-shadow: 0 0 0 3px rgba(59, 126, 246, 0.15);
+}
+
+.dropdown-enter {
+    animation: dropIn .18s ease;
+}
+
+@keyframes dropIn {
+    from {
+        opacity: 0;
+        transform: translateY(-6px) scale(0.97);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.mobile-slide {
+    animation: slideDown .2s ease;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.notif-dot {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        opacity: 1
+    }
+
+    50% {
+        opacity: .5
+    }
+}

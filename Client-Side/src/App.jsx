@@ -6,12 +6,14 @@ import EmailVerifySuccess from './pages/EmailVerifySuccess'
 import Home from './pages/Home'
 import EmailVerifyFailed from './pages/EmailVerifyFailed'
 import Signup from './pages/Signup'
+import Navbar from './components/Navbar'
 
 
 function App() {
 
   return (
     <Router>
+      <Navbar/>
       <ScrollTop />
       <Routes>
         <Route path='/' element={<Home />} />
