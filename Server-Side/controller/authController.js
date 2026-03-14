@@ -4,9 +4,7 @@ import User from "../model/User.js";
 import crypto from "crypto";
 import RefreshToken from "../model/RefreshToken.js";
 import jwt from "jsonwebtoken";
-import sendEmail from "../utils/sendEmail.js";
 import { sendEmailEvent } from "../utils/kafkaProducer.js";
-import { type } from "os";
 
 export const signup = async (req, res, next) => {
     try {

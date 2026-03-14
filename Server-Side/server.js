@@ -7,6 +7,7 @@ import morgan from "morgan";
 import connectDB from "./config/connectDB.js";
 import { connectProducer } from "./utils/kafkaProducer.js";
 import authRoute from "./route/authRoute.js";
+import userRoutes from "./route/userRoute.js";
 
 dotenv.config();
 
@@ -41,6 +42,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 app.use("/api/auth", authRoute);
+app.use("/api/user", userRoutes);
 
 app.get("/", (req, res) => {
   res.status(200).json({ message: "Server Running" });

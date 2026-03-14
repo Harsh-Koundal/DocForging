@@ -26,6 +26,7 @@ const documentSchema = new mongoose.Schema(
                     ref:"User",
                 },
                 role:{
+                    type:String,
                     enum:["viewer","editor","owner"],
                     default:"viewer",
                 }
