@@ -1,16 +1,45 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   FileText, ChevronDown,
   LogOut, Moon, Sun
 } from 'lucide-react';
 import "../index.css";
+import axios from 'axios';
+import toast from 'react-hot-toast';
 
-
-
- function Navbar() {
+function Navbar() {
   const [profileOpen, setProfileOpen] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
+  const [user, setUser] = useState(null);
 
+  useEffect(()=>{
+    const fetchUser = async()=>{
+      try{
+        const res = await axios.get(`${import.meta.env.VITE_BACKEND_BASE_URL}/api/user/me`,{
+          withCredentials:true,
+        })
+        console.log("Current user:", res.data.user);
+        setUser(res.data.user);
+      }catch(err){
+        console.error("Failed to fetch current user", err);
+        toast.error("Failed to fetch user data");
+      }
+    }
+    fetchUser();
+  },[]);
+
+  const logout = async ()=>{
+    try{
+      await axios.post(`${import.meta.env.VITE_BACKEND_BASE_URL}/api/auth/logout`,{},{
+        withCredentials:true,
+      });
+      setUser(null);
+      toast.success("Logged out successfully");
+    }catch(err){
+      console.error("Logout failed", err);
+      toast.error("Logout failed");
+    }
+  }
   return (
     <>
 
@@ -44,15 +73,15 @@ import "../index.css";
             {/* Profile */}
             <div className="relative ml-1">
               <button
-                onClick={() => { setProfileOpen(p => !p); setNotifOpen(false); }}
+                onClick={() => { setProfileOpen(p => !p)}}
                 className="flex items-center gap-2 pl-1 pr-2 py-1 rounded-xl hover:bg-slate-100 bg-transparent border-none cursor-pointer transition-all duration-150"
               >
                 <div className="w-7 h-7 rounded-lg flex items-center justify-center text-white text-[11px] font-bold flex-shrink-0"
                   style={{ background: 'linear-gradient(135deg,#3b7ef6,#7b5bf7)' }}>
-                  A
+                  {user?.name ? user.name.charAt(0).toUpperCase() : 'G'}
                 </div>
                 <div className="hidden lg:flex flex-col items-start">
-                  <span className="text-[12.5px] font-medium text-slate-700 leading-tight">Ankur</span>
+                  <span className="text-[12.5px] font-medium text-slate-700 leading-tight">{user?.name || 'Guest'}</span>
                 </div>
                 <ChevronDown size={13} className={`hidden lg:block text-slate-400 transition-transform duration-200 ${profileOpen ? 'rotate-180' : ''}`} />
               </button>
@@ -64,16 +93,17 @@ import "../index.css";
                   <div className="px-4 py-3 border-b border-slate-100">
                     <div className="flex items-center gap-2.5">
                       <div className="w-9 h-9 rounded-xl flex items-center justify-center text-white text-[13px] font-bold"
-                        style={{ background: 'linear-gradient(135deg,#3b7ef6,#7b5bf7)' }}>A</div>
+                        style={{ background: 'linear-gradient(135deg,#3b7ef6,#7b5bf7)' }}>{user?.name ? user.name.charAt(0).toUpperCase() : 'Guest'}</div>
                       <div>
-                        <p className="text-[13px] font-semibold text-slate-800">Ankur Dev</p>
-                        <p className="text-[11px] text-slate-400">ankur@docforging.io</p>
+                        <p className="text-[13px] font-semibold text-slate-800">{user?.name || 'Guest'}</p>
+                        <p className="text-[11px] text-slate-400">{user?.email || 'Guest Email'}</p>
                       </div>
                     </div>
                   </div>
                   {/* Logout */}
                   <div className="border-t border-slate-100 py-1.5">
-                    <button className="w-full flex items-center gap-2.5 px-4 py-2 text-[13px] text-red-500 hover:bg-red-50 bg-transparent border-none cursor-pointer transition-colors duration-100 text-left">
+                    <button className="w-full flex items-center gap-2.5 px-4 py-2 text-[13px] text-red-500 hover:bg-red-50 bg-transparent border-none cursor-pointer transition-colors duration-100 text-left"
+                    onClick={logout}>
                       <LogOut size={14} strokeWidth={1.8} />
                       Sign out
                     </button>
