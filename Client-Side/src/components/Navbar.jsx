@@ -7,7 +7,6 @@ import { useAuth } from '../context/AuthContext';
 
 function Navbar() {
   const [profileOpen, setProfileOpen] = useState(false);
-  const [darkMode, setDarkMode] = useState(false);
   const { user, logout } = useAuth();
 
   useEffect(()=>{
@@ -33,18 +32,7 @@ function Navbar() {
             </span>
           </a>
           <div className="flex items-center gap-1">
-            <div className="border-t border-slate-100 px-4 py-2.5 flex items-center justify-between">
-              <div className="flex items-center gap-2 text-[13px] text-slate-600">
-                {darkMode ? <Moon size={14} className="text-slate-400" strokeWidth={1.8} /> : <Sun size={14} className="text-slate-400" strokeWidth={1.8} />}
-                Dark mode
-              </div>
-              <button
-                onClick={() => setDarkMode(p => !p)}
-                className={`relative w-9 h-5 rounded-full border-none cursor-pointer transition-all duration-200 ${darkMode ? 'bg-blue-500' : 'bg-slate-200'}`}
-              >
-                <span className={`absolute top-0.5 w-4 h-4 bg-white rounded-full shadow transition-all duration-200 ${darkMode ? 'left-[calc(100%-18px)]' : 'left-0.5'}`} />
-              </button>
-            </div>
+            
             {/* Profile */}
             {user ? (
               <div className="relative ml-1">
