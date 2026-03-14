@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   FileText, ChevronDown,
   LogOut, Moon, Sun
@@ -9,6 +9,15 @@ function Navbar() {
   const [profileOpen, setProfileOpen] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
   const { user, logout } = useAuth();
+
+  useEffect(()=>{
+    const handleClick = () => setProfileOpen(false);
+    if(profileOpen) {
+      window.addEventListener('click', handleClick);
+    }
+    return () => window.removeEventListener('click', handleClick);
+  },[profileOpen]);
+
   return (
     <nav className="nav-font sticky top-0 z-50 w-full bg-white border-b border-slate-200/80 backdrop-blur-sm">
 
@@ -40,7 +49,7 @@ function Navbar() {
             {user ? (
               <div className="relative ml-1">
                 <button
-                  onClick={() => { setProfileOpen(p => !p) }}
+                  onClick={(e) => { e.stopPropagation(); setProfileOpen(p => !p) }}
                   className="flex items-center gap-2 pl-1 pr-2 py-1 rounded-xl hover:bg-slate-100 bg-transparent border-none cursor-pointer transition-all duration-150"
                 >
                   <div className="w-7 h-7 rounded-lg flex items-center justify-center text-white text-[11px] font-bold flex-shrink-0 bg-gradient-to-br from-blue-500 to-purple-500">
@@ -54,7 +63,8 @@ function Navbar() {
 
 
                 {profileOpen && (
-                  <div className="dropdown-enter absolute right-0 top-[calc(100%+8px)] w-[220px] bg-white rounded-2xl border border-slate-200 shadow-xl shadow-slate-200/60 overflow-hidden z-50">
+                  <div className="dropdown-enter absolute right-0 top-[calc(100%+8px)] w-[220px] bg-white rounded-2xl border border-slate-200 shadow-xl shadow-slate-200/60 overflow-hidden z-50"
+                  onClick={(e)=> e.stopPropagation()}>
                     {/* User info */}
                     <div className="px-4 py-3 border-b border-slate-100">
                       <div className="flex items-center gap-2.5">

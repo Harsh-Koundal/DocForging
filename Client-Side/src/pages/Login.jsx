@@ -2,89 +2,55 @@ import { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
+import { useAuth } from '../context/AuthContext';
+import {
+  FileText,
+  PenLine,
+  Users,
+  Cloud,
+  Sparkles,
+  EyeOff,
+  Eye,
 
-/* ─── Feature Carousel Data ─────────────────────────────────────── */
+} from "lucide-react";
+
 const FEATURES = [
   {
-    icon: (
-      <svg width="28" height="28" fill="none" viewBox="0 0 24 24">
-        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-        <polyline points="14,2 14,8 20,8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-        <line x1="9" y1="13" x2="15" y2="13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-        <line x1="9" y1="17" x2="13" y2="17" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-      </svg>
-    ),
-    label: 'PDF → DOCX Conversion',
-    desc: 'Extract, preserve, and edit any PDF instantly — tables, images, and layouts all included.',
-    color: '#3b7ef6',
-    bg: 'rgba(59,126,246,0.08)',
+    icon: FileText,
+    label: "PDF → DOCX Conversion",
+    desc: "Extract, preserve, and edit any PDF instantly — tables, images, and layouts all included.",
+    color: "#3b7ef6",
+    bg: "rgba(59,126,246,0.08)",
   },
   {
-    icon: (
-      <svg width="28" height="28" fill="none" viewBox="0 0 24 24">
-        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-      </svg>
-    ),
-    label: 'Rich Document Editor',
-    desc: 'Full-featured editing: headings, tables, lists, images, comments, and track changes.',
-    color: '#18a870',
-    bg: 'rgba(24,168,112,0.08)',
+    icon: PenLine,
+    label: "Rich Document Editor",
+    desc: "Full-featured editing: headings, tables, lists, images, comments, and track changes.",
+    color: "#18a870",
+    bg: "rgba(24,168,112,0.08)",
   },
   {
-    icon: (
-      <svg width="28" height="28" fill="none" viewBox="0 0 24 24">
-        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-        <circle cx="9" cy="7" r="4" stroke="currentColor" strokeWidth="1.5"/>
-        <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-      </svg>
-    ),
-    label: 'Real-time Collaboration',
-    desc: 'Co-edit documents live. See cursors, comments, and changes from your entire team.',
-    color: '#e07b20',
-    bg: 'rgba(224,123,32,0.08)',
+    icon: Users,
+    label: "Real-time Collaboration",
+    desc: "Co-edit documents live. See cursors, comments, and changes from your entire team.",
+    color: "#e07b20",
+    bg: "rgba(224,123,32,0.08)",
   },
   {
-    icon: (
-      <svg width="28" height="28" fill="none" viewBox="0 0 24 24">
-        <ellipse cx="12" cy="5" rx="9" ry="3" stroke="currentColor" strokeWidth="1.5"/>
-        <path d="M21 12c0 1.66-4.03 3-9 3S3 13.66 3 12" stroke="currentColor" strokeWidth="1.5"/>
-        <path d="M3 5v14c0 1.66 4.03 3 9 3s9-1.34 9-3V5" stroke="currentColor" strokeWidth="1.5"/>
-      </svg>
-    ),
-    label: 'Cloud Storage & Sync',
-    desc: 'All your documents stored securely in the cloud, accessible from any device, anywhere.',
-    color: '#9333ea',
-    bg: 'rgba(147,51,234,0.08)',
+    icon: Cloud,
+    label: "Cloud Storage & Sync",
+    desc: "All your documents stored securely in the cloud, accessible from any device, anywhere.",
+    color: "#9333ea",
+    bg: "rgba(147,51,234,0.08)",
   },
   {
-    icon: (
-      <svg width="28" height="28" fill="none" viewBox="0 0 24 24">
-        <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="1.5"/>
-        <path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-        <path d="M15.54 8.46a5 5 0 0 1 0 7.07M8.46 8.46a5 5 0 0 0 0 7.07" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-      </svg>
-    ),
-    label: 'AI-Powered Writing',
-    desc: 'Let AI draft, rewrite, summarize, or translate your documents instantly on demand.',
-    color: '#e0285a',
-    bg: 'rgba(224,40,90,0.08)',
+    icon: Sparkles,
+    label: "AI-Powered Writing",
+    desc: "Let AI draft, rewrite, summarize, or translate your documents instantly on demand.",
+    color: "#e0285a",
+    bg: "rgba(224,40,90,0.08)",
   },
 ];
-
-const EyeOff = () => (
-  <svg width="17" height="17" fill="none" viewBox="0 0 24 24">
-    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-    <line x1="1" y1="1" x2="23" y2="23" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-  </svg>
-);
-
-const EyeOn = () => (
-  <svg width="17" height="17" fill="none" viewBox="0 0 24 24">
-    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-    <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="1.5"/>
-  </svg>
-);
 
 const Login = () => {
   const navigate = useNavigate();
@@ -95,6 +61,7 @@ const Login = () => {
   const [mounted, setMounted] = useState(false);
   const [activeFeature, setActiveFeature] = useState(0);
   const intervalRef = useRef(null);
+  const { fetchUser } = useAuth();
 
   useEffect(() => {
     setMounted(true);
@@ -122,6 +89,7 @@ const Login = () => {
         { withCredentials: true, headers: { 'Content-Type': 'application/json' } }
       );
       setFormData({ email: '', password: '' });
+      await fetchUser();
       toast.success('Welcome back!');
       navigate('/');
     } catch (err) {
@@ -137,6 +105,7 @@ const Login = () => {
   };
 
   const f = FEATURES[activeFeature];
+  const Icon = f.icon;
 
   return (
     <div className="min-h-screen bg-slate-50 flex relative overflow-hidden">
@@ -222,7 +191,7 @@ const Login = () => {
                 className="w-12 h-12 rounded-xl flex items-center justify-center mb-3.5 transition-all duration-300"
                 style={{ background: f.bg, color: f.color }}
               >
-                {f.icon}
+                <Icon size={20} strokeWidth={1.8} />
               </div>
               <div className="text-base font-semibold mb-1.5 transition-colors duration-300" style={{ color: f.color }}>
                 {f.label}
@@ -368,7 +337,7 @@ const Login = () => {
                   onClick={() => setShowPass(p => !p)}
                   className="absolute right-3.5 top-1/2 -translate-y-1/2 bg-transparent border-none cursor-pointer p-0.5 flex items-center text-slate-400 transition-colors duration-200 hover:text-slate-600"
                 >
-                  {showPass ? <EyeOff /> : <EyeOn />}
+                  {showPass ? <EyeOff /> : <Eye />}
                 </button>
               </div>
             </div>
