@@ -78,14 +78,6 @@ function Home() {
                 </button>
               </div>
             </div>
-            <div className="flex gap-8 flex-shrink-0">
-              {[['24', 'Documents'], ['6', 'Shared'], ['3', 'Active Now']].map(([num, label]) => (
-                <div key={label} className="text-center">
-                  <div className="font-syne text-3xl font-bold text-white leading-none">{num}</div>
-                  <div className="text-xs text-white/45 mt-1 tracking-wide uppercase">{label}</div>
-                </div>
-              ))}
-            </div>
           </div>
         </div>
 
@@ -152,7 +144,7 @@ function Home() {
         <div className="grid grid-cols-3 gap-4 mb-8">
           {RECENT_FILES.map(file => (
             <div key={file.id} className="bg-white border border-gray-200 rounded-xl overflow-hidden cursor-pointer hover:shadow-lg hover:-translate-y-0.5 transition-all">
-              <div className={`h-30 ${file.bg} p-4 relative`}>
+              <div className={`h-44 ${file.bg} p-6 relative`}>
                 <span className={`absolute top-3 right-3 px-2 py-0.5 rounded text-xs font-semibold tracking-wide uppercase ${file.badgeStyle}`}>
                   {file.badge}
                 </span>
