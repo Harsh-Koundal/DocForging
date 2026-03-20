@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { SearchIcon, ActivityIcon } from "lucide-react";
+import { SearchIcon, ActivityIcon,PlusIcon } from "lucide-react";
 import FilePreviewLines from '../components/FilePreview';
+import {useNavigate} from "react-router-dom";
 
 const RECENT_FILES = [
   {
@@ -48,6 +49,7 @@ const ArrowIcon = () => (
 function Home() {
   const [activeTab, setActiveTab] = useState(0);
   const [searchVal, setSearchVal] = useState('');
+  const navigate = useNavigate();
 
   return (
     <div className="min-h-screen font-dm-sans text-gray-900">
@@ -68,8 +70,9 @@ function Home() {
                 Your workspace is ready. Pick up where you left off, or start something new.
               </p>
               <div className="flex gap-3 flex-wrap">
-                <button className="flex items-center gap-2 px-6 py-3 bg-gradient-to-br from-blue-500 to-purple-500 text-white rounded-xl font-medium shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all">
-                  <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" /></svg>
+                <button className="flex items-center gap-2 px-6 py-3 bg-gradient-to-br from-blue-500 to-purple-500 text-white rounded-xl font-medium shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all"
+                onClick={navigate("/:id")}>
+                  <PlusIcon/>
                   New Document
                 </button>
                 <button className="flex items-center gap-2 px-6 py-3 bg-white/10 text-white border border-white/15 rounded-xl font-normal hover:bg-white/20 transition-colors">

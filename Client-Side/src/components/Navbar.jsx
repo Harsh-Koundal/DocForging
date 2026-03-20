@@ -20,7 +20,7 @@ function Navbar() {
   return (
     <nav className="nav-font sticky top-0 z-50 w-full bg-white border-b border-slate-200/80 backdrop-blur-sm">
 
-        <div className="max-w-[1280px] mx-auto px-4 lg:px-6 h-[60px] flex items-center gap-3 justify-between">
+        <div className="max-w-[1280px] mx-auto px-4 lg:px-6 h-[60px] flex items-center gap-3 justify-between cursor-pointer">
 
           {/* Logo */}
           <a href="/" className="flex items-center gap-2 no-underline flex-shrink-0 mr-2">
